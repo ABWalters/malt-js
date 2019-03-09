@@ -1,0 +1,12 @@
+{
+  "extends": ["airbnb", "prettier"],
+  "plugins": ["prettier", "react-hooks"],
+  "rules": {
+    "prettier/prettier": ["warn"],
+    "no-prototype-builtins": "off",
+    "react/prop-types": "warn",
+    "react/jsx-filename-extension": ["error", { "extensions": [".js", ".jsx"] }],
+    "react-hooks/rules-of-hooks": "error"
+  },
+  "parser": "babel-eslint"
+}
