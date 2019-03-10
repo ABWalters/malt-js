@@ -18,16 +18,30 @@ class XMLSerializer {
       entityEl.ele('Value', {}, entity.value);
       entityEl.ele('Weight', {}, entity.weight);
       // TODO: Serialize display info
-      const propertiesEl = entityEl.ele('AdditionalFields');
-      Object.keys(entity.properties).forEach(propKey => {
-        const prop = entity.properties[propKey];
-        const { value, display, isStrict } = prop;
-        propertiesEl.ele(
-          'AdditionalField',
-          { Name: propKey, MatchingRule: isStrict ? 'strict' : undefined, DisplayName: display },
-          value
-        );
-      });
+      this.serializeEntityDisplay(entityEl, entity.display);
+      this.serializeEntityProperties(entityEl, entity.properties);
+    });
+  }
+
+  static serializeEntityDisplay(entityEl, display) {
+    const displayEl = entityEl.ele('DisplayInformation');
+    display.sections.forEach(sect => {
+      const { text, title } = sect;
+      const labelEl = displayEl.ele('Label', { Name: title, Type: 'text/html' });
+      labelEl.dat(text);
+    });
+  }
+
+  static serializeEntityProperties(entityEl, properties) {
+    const propertiesEl = entityEl.ele('AdditionalFields');
+    Object.keys(properties).forEach(propKey => {
+      const prop = properties[propKey];
+      const { value, display, isStrict } = prop;
+      propertiesEl.ele(
+        'AdditionalField',
+        { Name: propKey, MatchingRule: isStrict ? 'strict' : undefined, DisplayName: display },
+        value
+      );
     });
   }
 }

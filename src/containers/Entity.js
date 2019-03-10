@@ -1,27 +1,25 @@
-function getDisplayFromKey(value) {
-  return value.replace(/_/gi, ' ').replace(/(^|\s)\w/gi, x => x.toUpperCase());
-}
+const { Display } = require('./Display');
+const { getDisplayFromKey } = require('../utils');
 
 class Entity {
   /**
    @param type {string} - Entity type
    @param value {string} - Entity value
-   @param properties {object} - Entity properties
-   **/
+   * */
   constructor(type, value) {
     this.type = type;
     this.value = value;
     this.weight = 100; // FIXME: More sensible default
     this.properties = {};
-
+    this.display = new Display();
     this.addProperty = this.addProperty.bind(this);
   }
 
   addProperty(key, value, display = undefined, isStrict = false) {
-    const finalDisplay = display ? display : getDisplayFromKey(key);
+    const finalDisplay = display || getDisplayFromKey(key);
 
     this.properties[key] = { value, display: finalDisplay, isStrict };
-    const link = {};
+    const link = {}; // TODO: Implement Link
     return link;
   }
 }
