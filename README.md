@@ -8,6 +8,6 @@ Write the transforms once, and have them run locally, as lambda scripts or as a 
 
 ```javascript
 app.transform({ inputType: Phrase, outputType: Phrase }, function helloWorld(request, response){
-  response.addEntity(Phrase, "Hello World")
+  response.addChildEntity(Phrase, "Hello World")
 });
 ```
