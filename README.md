@@ -1,12 +1,13 @@
 # malt-js
 
-Maltego transforms in 3 lines of code that can run anywhere.
+Library for writing Maltego transforms in Node.
+
+Write the transforms once, and have them run locally, as lambda scripts or as a Koa server.
 
 ## Usage
 
 ```javascript
-@transform('toDetails')
-function toDetails(resp, request){
-  request.addEntity(Phrase, "Hello World")
-}
+app.transform({ inputType: Phrase, outputType: Phrase }, function helloWorld(request, response){
+  response.addEntity(Phrase, "Hello World")
+});
 ```
