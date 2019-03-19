@@ -92,7 +92,10 @@ class App {
         console.log(xmlStr);
         // return xmlStr;
       })
-      .catch(console.log);
+      .catch(err => {
+        console.log('Caught transform error');
+        console.log(err);
+      });
   }
 }
 
