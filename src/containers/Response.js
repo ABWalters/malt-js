@@ -8,10 +8,7 @@ class Response{
 
   addChildEntity(entity){
     this.entities.push(entity);
-  }
-
-  createChildEntity(entityType, entityValue){
-
+    return entity;
   }
 }
 
