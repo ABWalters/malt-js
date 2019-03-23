@@ -1,4 +1,6 @@
+const { createEntityType } = require('../src/entities');
+
 module.exports = {
-  Identity: 'maltjs.Identity',
-  CrtShID: 'maltjs.CrtShID'
+  Identity: createEntityType('maltjs.Identity'),
+  CrtShID: createEntityType('maltjs.CrtShID')
 };
