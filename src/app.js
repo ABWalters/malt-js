@@ -16,24 +16,30 @@ class App {
   }
 
   transform(config, func) {
-    // console.log(config);
-    // console.log(func);
     this.transforms[this.getTransformName(config)] = func;
   }
 
   getTransformName(config) {
     if (config.name) {
       return name;
-    } else if (config.inputType && config.outputType) {
-      return `${this.getTypeWithoutNamespace(config.inputType)}-To-${this.getTypeWithoutNamespace(
-        config.outputType
-      )}`;
-    } else {
-      console.log(
-        'Error: You need to either specify a transform name, or specify the inputType AND outputType.'
-      );
-      return 'invalid-name-config';
     }
+    if (config.inputType && config.outputType) {
+      const inputTypeStr = config.inputType().type;
+      const outputTypeStr = config.outputType().type;
+
+      const baseName = `${this.getTypeWithoutNamespace(
+        inputTypeStr
+      )}-To-${this.getTypeWithoutNamespace(outputTypeStr)}`;
+
+      if (config.nameSuffix) {
+        return `${baseName}-${config.nameSuffix}`;
+      }
+      return baseName;
+    }
+    console.log(
+      'Error: You need to either specify a transform name, or specify the inputType AND outputType.'
+    );
+    return 'invalid-name-config';
   }
 
   getTypeWithoutNamespace(entityType) {
@@ -53,7 +59,6 @@ class App {
 
   isCommand() {
     const [nodePath, workDir, command] = process.argv;
-    console.log(process.argv);
     return !!(command && commands.indexOf(command) > -1);
   }
 
@@ -68,9 +73,12 @@ class App {
   }
 
   runCommand() {
-    const [nodePath, workDir, command] = process.argv;
+    const [, , command] = process.argv;
     if (command === 'list') {
-      console.log(this.transforms);
+      // console.log(this.transforms);
+      console.log('Available Transform Names:');
+      console.log('==========================');
+      Object.keys(this.transforms).forEach(key => console.log(key));
     }
   }
 

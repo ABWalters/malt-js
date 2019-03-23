@@ -43,7 +43,12 @@ class DisplayTable {
   }
 }
 
+function DisplayLink(href, text) {
+  return `<a href="${href}"><h5>${text || href}</h5></a>`;
+}
+
 module.exports = {
   Display,
-  DisplayTable
+  DisplayTable,
+  DisplayLink
 };
