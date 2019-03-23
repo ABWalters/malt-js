@@ -11,3 +11,24 @@ app.transform({ inputType: Phrase, outputType: Phrase }, function helloWorld(req
   response.addChildEntity(Phrase, "Hello World")
 });
 ```
+
+
+
+## Development
+
+### List Transforms
+
+```bash
+node index.js list
+```
+
+
+
+
+
+### Testing
+
+```bash
+node index.js <transform_name> <input_value>
+```
+
