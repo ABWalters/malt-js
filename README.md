@@ -7,8 +7,9 @@ Write the transforms once, and have them run locally, as lambda scripts or as a 
 ## Usage
 
 ```javascript
-app.transform({ inputType: Phrase, outputType: Phrase }, function helloWorld(request, response){
-  response.addChildEntity(Phrase, "Hello World")
+app.transform({ inputType: Person, outputType: Phrase }, function helloWorld(request, response){
+  const name = request.entity.value;
+  response.addChildEntity(Phrase(`Hello ${name}`))
 });
 ```
 
