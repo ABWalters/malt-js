@@ -1,8 +1,9 @@
 const LocalSerializer = require('./deserializers/localSerializer');
 const XMLSerializer = require('./serializers/XMLSerializer');
 const Response = require('./containers/Response');
+const documentTransforms = require('./commands/document');
 
-const commands = ['list'];
+const commands = ['list', 'document'];
 
 class App {
   constructor() {
@@ -16,7 +17,7 @@ class App {
   }
 
   transform(config, func) {
-    this.transforms[this.getTransformName(config)] = func;
+    this.transforms[this.getTransformName(config)] = { func, config };
   }
 
   getTransformName(config) {
@@ -79,6 +80,9 @@ class App {
       console.log('Available Transform Names:');
       console.log('==========================');
       Object.keys(this.transforms).forEach(key => console.log(key));
+    } else if (command === 'document'){
+      console.log('Document');
+      documentTransforms(this.transforms);
     }
   }
 

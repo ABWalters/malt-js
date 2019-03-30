@@ -1,6 +1,6 @@
 const { Phrase } = require('../../src/entities');
 const { CrtShID } = require('../entities');
-const { getCrtShMatch } = require('./common');
+const { getCrtShMatch, toDetailsDesc } = require('./common');
 const app = require('../../src/app');
 
 const issuerRegex = /Issuer.*?commonName.*?=.*?(.*?)<BR>/i;
@@ -14,4 +14,13 @@ async function idToIssuer(request, response) {
   }
 }
 
-app.transform({ inputType: CrtShID, outputType: Phrase, nameSuffix: 'Issuer' }, idToIssuer);
+app.transform(
+  {
+    inputType: CrtShID,
+    outputType: Phrase,
+    nameSuffix: 'Issuer',
+    display: 'To Issuer',
+    description: toDetailsDesc('issuer')
+  },
+  idToIssuer
+);

@@ -24,7 +24,11 @@ node index.js list
 ```
 
 
-
+### Generate Docs
+Generate markdown docs files for the transforms.
+```
+node index.js document
+```
 
 
 ### Testing

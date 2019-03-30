@@ -1,6 +1,6 @@
 /* eslint-disable camelcase */
 const { callAPI } = require('../../src/utils');
-const { Phrase } = require('../../src/entities');
+const { Phrase, Hash } = require('../../src/entities');
 const { CrtShID } = require('../entities');
 const app = require('../../src/app');
 const { DisplayTable } = require('../../src/containers/Display');
@@ -24,4 +24,22 @@ async function phraseToCrtShID(request, response) {
   responseToEntities(response, resp);
 }
 
-app.transform({ inputType: Phrase, outputType: CrtShID }, phraseToCrtShID);
+const toIDDesc = input => `Query crt.sh and return the CrtSH IDs matching the search ${input}.`;
+
+app.transform(
+  {
+    inputType: Phrase,
+    outputType: CrtShID,
+    description: toIDDesc('phrase')
+  },
+  phraseToCrtShID
+);
+
+app.transform(
+  {
+    inputType: Hash,
+    outputType: CrtShID,
+    description: toIDDesc('hash')
+  },
+  phraseToCrtShID
+);

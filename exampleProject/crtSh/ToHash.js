@@ -4,6 +4,7 @@ const { callAPI } = require('../../src/utils');
 const { Hash } = require('../../src/entities');
 const { CrtShID } = require('../entities');
 const app = require('../../src/app');
+const { toDetailsDesc } = require('./common');
 const { DisplayLink } = require('../../src/containers/Display');
 
 const hashValRegexExp = /<A href="(.*?)">(.*?)<\/A>/i;
@@ -43,4 +44,11 @@ async function idToHash(request, response) {
   });
 }
 
-app.transform({ inputType: CrtShID, outputType: Hash }, idToHash);
+app.transform(
+  {
+    inputType: CrtShID,
+    outputType: Hash,
+    description: toDetailsDesc('hashes')
+  },
+  idToHash
+);

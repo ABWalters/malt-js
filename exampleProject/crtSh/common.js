@@ -15,6 +15,9 @@ async function getCrtShMatch(id, regex, groupIndex = 1) {
   }
 }
 
+const toDetailsDesc = returnType => `Return the cert ${returnType} for a given CrtSH ID`;
+
 module.exports = {
-  getCrtShMatch
+  getCrtShMatch,
+  toDetailsDesc
 };
