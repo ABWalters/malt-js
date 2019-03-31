@@ -4,7 +4,7 @@ const writeFile = util.promisify(require('fs').writeFile);
 
 function documentFromConfig(transformName, transformConfig) {
   const markdown = `
-    ## ${transformConfig.display || getTransformDisplay(transformConfig)}
+    ## ${transformConfig.display}
     ${transformConfig.description || ''}
     
     | Param     | Value                               |
