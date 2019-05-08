@@ -1,17 +1,22 @@
-const Koa = require('koa');
 const LocalSerializer = require('./deserializers/localSerializer');
 const XMLSerializer = require('./serializers/XMLSerializer');
 const Response = require('./containers/Response');
 const documentTransforms = require('./commands/document');
-const getTransformDisplay = require('./utils').getTransformDisplay;
-const querystring = require('querystring');
-const xmlParser = require('koa-xml-body')
-const XMLDeserializer = require('./deserializers/XMLDeserializer');
+const { getTransformDisplay } = require('./utils');
+const getKoaApp = require('./server/koaApp');
+const startServer = require('./server/startServer');
 
 const commands = ['list', 'document'];
 
+const defaultConfig = {
+  port: 3000,
+  useHttps: false,
+  author: 'Anon',
+  owner: 'Anon'
+};
+
 class App {
-  constructor() {
+  constructor(userConfig) {
     this.transforms = {};
 
     this.transform = this.transform.bind(this);
@@ -20,29 +25,9 @@ class App {
     this.isLocal = this.isLocal.bind(this);
     this.isCommand = this.isCommand.bind(this);
 
-    this.koaApp = new Koa(); // TODO: Look at performance overhead
-    this.koaApp.use(xmlParser());
-    this.koaApp.use(async ctx => {
-      const { request } = ctx;
-      const { url } = request;
-      const urlParts = url.split('?');
-      const path = urlParts[0];
-      const queryString = urlParts[1];
-      const query = querystring.parse(queryString);
-      console.log('App.js', path, query);
-      if (
-        path === '/run/' &&
-        query.Command === '_RUN' &&
-        query.TransformToRun &&
-        this.transforms.hasOwnProperty(query.TransformToRun)
-      ) {
-        console.log('Should run transforms');
-        const r = XMLDeserializer.serialize(ctx.request.body);
-        const transformresp = this.executeTransform(this.transforms[query.TransformToRun].func, r);
-        // console.log(resp);
-        ctx.body = await transformresp;
-      }
-    });
+    this.config = { ...defaultConfig, ...userConfig };
+
+    this.koaApp = getKoaApp();
   }
 
   getKoaApp() {
@@ -56,13 +41,20 @@ class App {
     this.transforms[this.getTransformName(config)] = { func, config };
   }
 
-  getTransformName(config) {
-    if (config.name) {
+  /**
+   * Generate transform name from input and output types in config.
+   * @param config
+   * @return {never|string}
+   */
+  static getTransformName(config) {
+    const { name, inputType, outputType } = config;
+
+    if (name) {
       return name;
     }
-    if (config.inputType && config.outputType) {
-      const inputTypeStr = config.inputType().type;
-      const outputTypeStr = config.outputType().type;
+    if (inputType && outputType) {
+      const inputTypeStr = inputType().type;
+      const outputTypeStr = outputType().type;
 
       const baseName = `${App.getTypeWithoutNamespace(
         inputTypeStr
@@ -85,12 +77,11 @@ class App {
 
   isLocal() {
     const [nodePath, workDir, transformName, ...maltegoArgs] = process.argv;
-    if (transformName === undefined || maltegoArgs.length === 0) {
-      return false;
-    }
-    if (this.transforms.hasOwnProperty(transformName)) {
+    if (transformName !== undefined &&
+      this.transforms.hasOwnProperty(transformName)) {
       return true;
     }
+    console.log('Project not being run as local transform.');
     return false;
   }
 
@@ -108,24 +99,7 @@ class App {
   }
 
   startServer() {
-    console.log('Starting transform server.');
-    this.koaApp.use(async ctx => {
-      console.log('Internal middleware!');
-      // console.log(ctx);
-      // ctx.body = 'Hello World';
-    });
-    this.koaApp.listen(3000);
-    console.log('Transform server is running on port 3000.');
-  }
-
-  use(listenerFunc) {
-    if (this.koaApp) {
-      this.koaApp.use(listenerFunc);
-    } else {
-      console.log(
-        'Transform server not initialised. Make sure you call "startServer" before "use"'
-      );
-    }
+    startServer(this.koaApp, this.config);
   }
 
   run() {
@@ -157,24 +131,23 @@ class App {
     const [nodePath, workDir, transformName, ...maltegoArgs] = process.argv;
     const request = LocalSerializer.serialize(maltegoArgs);
     const transformFunc = this.transforms[transformName];
-    this.executeTransform(transformFunc, request).then(xmlStr => console.log(xmlStr));
+    this.executeTransform(transformFunc, request).
+      then(xmlStr => console.log(xmlStr));
   }
 
   executeTransform(transformFunc, request) {
     const response = new Response();
     const transformPromise = transformFunc(request, response);
-    return transformPromise
-      .then(() => {
-        // console.log('Transform finished!');
-        // console.log(response);
-        const xmlStr = XMLSerializer.serializeResponse(response);
-        // console.log(xmlStr);
-        return xmlStr;
-      })
-      .catch(err => {
-        console.log('Caught transform error');
-        console.log(err);
-      });
+    return transformPromise.then(() => {
+      // console.log('Transform finished!');
+      // console.log(response);
+      const xmlStr = XMLSerializer.serializeResponse(response);
+      // console.log(xmlStr);
+      return xmlStr;
+    }).catch(err => {
+      console.log('Caught transform error');
+      console.log(err);
+    });
   }
 }
 

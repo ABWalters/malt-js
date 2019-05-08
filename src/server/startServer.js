@@ -1,16 +1,18 @@
 const https = require('https');
 const sslConfig = require('./sslConfig');
 
-function startServer(koaApp, serverPort, useHttps) {
-  console.log(`Starting transform server: port=${serverPort}, https=${useHttps}`);
+function startServer(koaApp, config) {
+  const { port, useHttps } = config;
+  console.log(
+    `Starting transform server: port=${port}, https=${useHttps}`);
   if (!useHttps) {
     // Start the default koa server
-    this.koaApp.listen(3000);
+    this.koaApp.listen(port);
   } else {
     // Manually start node https listener
     try {
       const httpsServer = https.createServer(sslConfig, koaApp.callback());
-      httpsServer.listen(3000, err => {
+      httpsServer.listen(port, err => {
         if (err) {
           console.error('HTTPS server FAIL: ', err, err && err.stack);
         }
