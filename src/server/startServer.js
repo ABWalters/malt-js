@@ -7,7 +7,7 @@ function startServer(koaApp, config) {
     `Starting transform server: port=${port}, https=${useHttps}`);
   if (!useHttps) {
     // Start the default koa server
-    this.koaApp.listen(port);
+    koaApp.listen(port);
   } else {
     // Manually start node https listener
     try {

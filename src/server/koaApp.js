@@ -6,7 +6,7 @@ const XMLDeserializer = require('../deserializers/XMLDeserializer');
 /**
  * Handler used when a 'run transform' request is received.
  */
-async function runHandler(ctx) {
+async function runHandler(ctx, next) {
   const { request: { url } } = ctx;
   const urlParts = url.split('?');
   const path = urlParts[0];
@@ -25,6 +25,7 @@ async function runHandler(ctx) {
       this.transforms[query.TransformToRun].func, r);
     ctx.body = await transformResp;
   }
+  next();
 }
 
 /**
@@ -37,5 +38,5 @@ function getKoaApp() {
   return koaApp;
 }
 
-export default getKoaApp;
+module.exports = getKoaApp;
 

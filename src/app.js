@@ -8,15 +8,8 @@ const startServer = require('./server/startServer');
 
 const commands = ['list', 'document'];
 
-const defaultConfig = {
-  port: 3000,
-  useHttps: false,
-  author: 'Anon',
-  owner: 'Anon'
-};
-
 class App {
-  constructor(userConfig) {
+  constructor() {
     this.transforms = {};
 
     this.transform = this.transform.bind(this);
@@ -25,20 +18,21 @@ class App {
     this.isLocal = this.isLocal.bind(this);
     this.isCommand = this.isCommand.bind(this);
 
-    this.config = { ...defaultConfig, ...userConfig };
+    this.config = {
+      port: 3000,
+      useHttps: false,
+      author: 'Anon',
+      owner: 'Anon'
+    };
 
     this.koaApp = getKoaApp();
-  }
-
-  getKoaApp() {
-    return this.koaApp;
   }
 
   transform(config, func) {
     if (!config.display) {
       config.display = getTransformDisplay(config);
     }
-    this.transforms[this.getTransformName(config)] = { func, config };
+    this.transforms[App.getTransformName(config)] = { func, config };
   }
 
   /**
@@ -77,8 +71,7 @@ class App {
 
   isLocal() {
     const [nodePath, workDir, transformName, ...maltegoArgs] = process.argv;
-    if (transformName !== undefined &&
-      this.transforms.hasOwnProperty(transformName)) {
+    if (transformName !== undefined && this.transforms.hasOwnProperty(transformName)) {
       return true;
     }
     console.log('Project not being run as local transform.');
@@ -131,23 +124,24 @@ class App {
     const [nodePath, workDir, transformName, ...maltegoArgs] = process.argv;
     const request = LocalSerializer.serialize(maltegoArgs);
     const transformFunc = this.transforms[transformName];
-    this.executeTransform(transformFunc, request).
-      then(xmlStr => console.log(xmlStr));
+    this.executeTransform(transformFunc, request).then(xmlStr => console.log(xmlStr));
   }
 
   executeTransform(transformFunc, request) {
     const response = new Response();
     const transformPromise = transformFunc(request, response);
-    return transformPromise.then(() => {
-      // console.log('Transform finished!');
-      // console.log(response);
-      const xmlStr = XMLSerializer.serializeResponse(response);
-      // console.log(xmlStr);
-      return xmlStr;
-    }).catch(err => {
-      console.log('Caught transform error');
-      console.log(err);
-    });
+    return transformPromise
+      .then(() => {
+        // console.log('Transform finished!');
+        // console.log(response);
+        const xmlStr = XMLSerializer.serializeResponse(response);
+        // console.log(xmlStr);
+        return xmlStr;
+      })
+      .catch(err => {
+        console.log('Caught transform error');
+        console.log(err);
+      });
   }
 }
 
