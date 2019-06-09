@@ -46,4 +46,4 @@ class XMLSerializer {
   }
 }
 
-module.exports = XMLSerializer;
+export default XMLSerializer;

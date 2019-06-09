@@ -1,5 +1,5 @@
-const https = require('https');
-const sslConfig = require('./sslConfig');
+import https from 'https';
+import sslConfig from './sslConfig';
 
 function startServer(koaApp, config) {
   const { port, useHttps } = config;
@@ -23,4 +23,4 @@ function startServer(koaApp, config) {
   }
 }
 
-module.exports = startServer;
+export default startServer;

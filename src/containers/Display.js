@@ -1,6 +1,6 @@
-const { getDisplayFromKey } = require('../utils');
+import { getDisplayFromKey } from '../utils';
 
-class Display {
+export class Display {
   // Entity display info
   constructor() {
     this.sections = [];
@@ -11,7 +11,7 @@ class Display {
   }
 }
 
-class DisplayTable {
+export class DisplayTable {
   static fromObject(object) {
     const header = { columns: ['Key', 'Value'], isBold: true };
     const rows = [header];
@@ -43,12 +43,6 @@ class DisplayTable {
   }
 }
 
-function DisplayLink(href, text) {
+export function DisplayLink(href, text) {
   return `<a href="${href}"><h5>${text || href}</h5></a>`;
 }
-
-module.exports = {
-  Display,
-  DisplayTable,
-  DisplayLink
-};

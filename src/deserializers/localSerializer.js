@@ -1,6 +1,5 @@
-const Entity = require('../containers/Entity');
-const Request = require('../containers/Request');
-const types = require('../types');
+import Entity from '../containers/Entity';
+import Request from '../containers/Request';
 
 class LocalSerializer {
   /*
@@ -10,7 +9,7 @@ class LocalSerializer {
   static serialize(maltegoArgs) {
     const request = new Request();
     const [value, ...properties] = maltegoArgs;
-    const inputEntity = new Entity(types.local, value);
+    const inputEntity = new Entity('maltego.Local', value);
     LocalSerializer.addPropertiesToEntity(properties, inputEntity);
 
     request.addEntity(inputEntity);
@@ -25,4 +24,4 @@ class LocalSerializer {
   }
 }
 
-module.exports = LocalSerializer;
+export default LocalSerializer;

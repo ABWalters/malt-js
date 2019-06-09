@@ -1,5 +1,5 @@
-const { Display } = require('./Display');
-const { getDisplayFromKey } = require('../utils');
+import { Display } from './Display';
+import { getDisplayFromKey } from '../utils';
 
 class Entity {
   /**
@@ -27,4 +27,4 @@ class Entity {
   }
 }
 
-module.exports = Entity;
+export default Entity;

@@ -1,18 +1,15 @@
-const LocalSerializer = require('./deserializers/localSerializer');
-const XMLSerializer = require('./serializers/XMLSerializer');
-const Response = require('./containers/Response');
-const documentTransforms = require('./commands/document');
-const { getTransformDisplay } = require('./utils');
-const getKoaApp = require('./server/koaApp');
-const startServer = require('./server/startServer');
+import LocalSerializer from './deserializers/localSerializer';
+import XMLSerializer from './serializers/XMLSerializer';
+import Response from './containers/Response';
+import documentTransforms from './commands/document';
+import getKoaApp from './server/koaApp';
+import startServer from './server/startServer';
+import { executeTransform, getNameConfigMap } from './transform';
 
 const commands = ['list', 'document'];
 
 class App {
-  constructor() {
-    this.transforms = {};
-
-    this.transform = this.transform.bind(this);
+  constructor(meta, config) {
     this.run = this.run.bind(this);
     this.runLocalTransform = this.runLocalTransform.bind(this);
     this.isLocal = this.isLocal.bind(this);
@@ -20,53 +17,26 @@ class App {
 
     this.config = {
       port: 3000,
-      useHttps: false,
-      author: 'Anon',
-      owner: 'Anon'
+      useHttps: false
     };
+
+    this.meta = meta;
 
     this.koaApp = getKoaApp();
   }
 
-  transform(config, func) {
-    if (!config.display) {
-      config.display = getTransformDisplay(config);
-    }
-    this.transforms[App.getTransformName(config)] = { func, config };
-  }
+  getTransforms() {
+    const map = getNameConfigMap();
 
-  /**
-   * Generate transform name from input and output types in config.
-   * @param config
-   * @return {never|string}
-   */
-  static getTransformName(config) {
-    const { name, inputType, outputType } = config;
+    const mergedMap = {}; // Merge in app.meta with the individual transform configs
 
-    if (name) {
-      return name;
-    }
-    if (inputType && outputType) {
-      const inputTypeStr = inputType().type;
-      const outputTypeStr = outputType().type;
+    Object.keys(map).forEach(key => {
+      const value = map[key];
+      const mergedValue = { ...value, ...this.meta };
+      mergedMap[key] = mergedValue;
+    });
 
-      const baseName = `${App.getTypeWithoutNamespace(
-        inputTypeStr
-      )}-To-${App.getTypeWithoutNamespace(outputTypeStr)}`;
-
-      if (config.nameSuffix) {
-        return `${baseName}-${config.nameSuffix}`;
-      }
-      return baseName;
-    }
-    console.log(
-      'Error: You need to either specify a transform name, or specify the inputType AND outputType.'
-    );
-    return 'invalid-name-config';
-  }
-
-  static getTypeWithoutNamespace(entityType) {
-    return entityType.split('.', 2)[1]; // TODO: Error handling for no namespace.
+    return mergedMap;
   }
 
   isLocal() {
@@ -124,27 +94,26 @@ class App {
     const [nodePath, workDir, transformName, ...maltegoArgs] = process.argv;
     const request = LocalSerializer.serialize(maltegoArgs);
     const transformFunc = this.transforms[transformName];
-    this.executeTransform(transformFunc, request).then(xmlStr => console.log(xmlStr));
-  }
-
-  executeTransform(transformFunc, request) {
-    const response = new Response();
-    const transformPromise = transformFunc(request, response);
-    return transformPromise
-      .then(() => {
-        // console.log('Transform finished!');
-        // console.log(response);
-        const xmlStr = XMLSerializer.serializeResponse(response);
-        // console.log(xmlStr);
-        return xmlStr;
-      })
-      .catch(err => {
-        console.log('Caught transform error');
-        console.log(err);
-      });
+    executeTransform(transformFunc, request).then(xmlStr => console.log(xmlStr));
   }
 }
 
-const app = new App();
+let app;
 
-module.exports = app;
+/**
+ * Function used to initialise transform server.
+ *
+ * @param {Object} meta - Global meta used for the server.
+ * @param {string} meta.author - Author of the transforms
+ * @param {Object} config={} - Server config object.
+ */
+function server(meta, config = {}) {
+  if (!app) {
+    app = new App(meta, config);
+  } else {
+    console.log('Warning: Server already initialised.');
+  }
+  return app;
+}
+
+export default server;

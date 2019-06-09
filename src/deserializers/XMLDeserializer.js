@@ -1,7 +1,6 @@
-const Entity = require('../containers/Entity');
-const Request = require('../containers/Request');
-// const types = require('../types');
-var parseString = require('xml2js').parseString;
+import { parseString } from 'xml2js';
+import Entity from '../containers/Entity';
+import Request from '../containers/Request';
 
 class XMLDeserializer {
   /*
@@ -12,9 +11,9 @@ class XMLDeserializer {
     const maltegoRequest = requestBody.MaltegoMessage.MaltegoTransformRequestMessage;
     const entity = maltegoRequest[0].Entities[0];
     const limits = maltegoRequest[0].Limits;
-    const type = entity.Entity[0]['$'].Type;
+    const type = entity.Entity[0].$.Type;
     const value = entity.Entity[0].Value[0];
-    const slider = limits[0]['$'].HardLimit;
+    const slider = limits[0].$.HardLimit;
     console.log(JSON.stringify(entity, null, 2));
     console.log(type);
     console.log(value);
@@ -44,4 +43,4 @@ class XMLDeserializer {
   // }
 }
 
-module.exports = XMLDeserializer;
+export default XMLDeserializer;

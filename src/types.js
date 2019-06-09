@@ -1,5 +1,13 @@
-const TYPES = {
-  local: 'maltego.Local' // Placeholder for entity type when running local transform.
-};
+import Entity from './containers/Entity';
 
-module.exports = TYPES;
+export function createEntityType(typeStr) {
+  return (value, properties) => {
+    return new Entity(typeStr, value, properties);
+  };
+}
+
+export const types = {
+  DNS: createEntityType('maltego.DNS'),
+  Hash: createEntityType('maltego.Hash'),
+  Phrase: createEntityType('maltego.Phrase')
+};
