@@ -1,12 +1,23 @@
 const app = require('../src/app');
-const maltJSDiscovery = require('malt-js-discovery');
 
+// Import transform files
 require('./crtSh/ToHash');
 require('./crtSh/ToCrtShID');
 require('./crtSh/ToIssuer');
 require('./crtSh/ToSubjectNames');
 require('./crtSh/ToSerial');
 
-// app.use(maltJSDiscovery);
-// app.run();
-maltJSDiscovery(app);
+try {
+  const discoveryHandler = require('./discovery');
+  console.log('Imported discovery handler.');
+  app.config.useHttps = true;
+  app.koaApp.use((ctx, next) => discoveryHandler(ctx, next, app));
+  console.log(app.koaApp.use);
+} catch (e) {
+  // pass
+}
+
+app.config.author = 'ABWalters';
+app.config.owner = 'ABWalters';
+
+app.run();
