@@ -90,6 +90,10 @@ export function executeTransform(transformFunc, request) {
  *
  * @param {function} transformFunc - Function receiving request and response objects, that runs the transforms
  * @param {object} config - Config object used to store data about the transform
+ * @param {object} config.inputType - Input data
+ * @param {object} config.outputType= - Type of data returned
+ * @param {string} config.description - Description displayed to the user
+ * @param {string} config.nameSuffix='' - String added to the end of a transform name to ensure it stays unique.
  */
 export function transform(transformFunc, config) {
   if (!config.display) {

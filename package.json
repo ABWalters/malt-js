@@ -2,13 +2,11 @@
   "name": "malt-js",
   "version": "0.0.1",
   "description": "Library for writing Maltego transforms in Node.",
-  "main": "index.js",
+  "main": "dist/index.js",
   "dependencies": {
     "axios": "^0.18.0",
     "koa": "^2.7.0",
     "koa-xml-body": "^2.1.0",
-    "nodemon": "^1.18.10",
-    "prettier": "^1.16.4",
     "xmlbuilder": "^12.0.0"
   },
   "devDependencies": {
@@ -23,6 +21,8 @@
     "eslint-plugin-react": "^7.12.4",
     "eslint-plugin-react-hooks": "^1.5.1",
     "microbundle": "^0.11.0",
+    "nodemon": "^1.18.10",
+    "prettier": "^1.16.4",
     "rollup": "^1.11.3"
   },
   "files": [
@@ -31,7 +31,7 @@
   "scripts": {
     "start": "nodemon exampleProject/index.js",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "rollup src/index.js --format cjs --file dist/index.js"
+    "build": "rollup -c"
   },
   "repository": {
     "type": "git",

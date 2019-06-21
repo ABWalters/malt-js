@@ -1,30 +1,26 @@
-import LocalSerializer from './deserializers/localSerializer';
-import XMLSerializer from './serializers/XMLSerializer';
-import Response from './containers/Response';
 import documentTransforms from './commands/document';
+import LocalSerializer from './deserializers/localSerializer';
 import getKoaApp from './server/koaApp';
-import startServer from './server/startServer';
 import { executeTransform, getNameConfigMap } from './transform';
 
 const commands = ['list', 'document'];
 
-class App {
+class Server {
   constructor(meta, config) {
     this.run = this.run.bind(this);
     this.runLocalTransform = this.runLocalTransform.bind(this);
     this.isLocal = this.isLocal.bind(this);
     this.isCommand = this.isCommand.bind(this);
 
-    this.config = {
-      port: 3000,
-      useHttps: false
-    };
-
+    this.config = config;
     this.meta = meta;
 
     this.koaApp = getKoaApp();
   }
 
+  /**
+   * Method called for discovery to list the transforms that the server has available.
+   */
   getTransforms() {
     const map = getNameConfigMap();
 
@@ -40,6 +36,7 @@ class App {
   }
 
   isLocal() {
+    // eslint-disable-next-line no-unused-vars
     const [nodePath, workDir, transformName, ...maltegoArgs] = process.argv;
     if (transformName !== undefined && this.transforms.hasOwnProperty(transformName)) {
       return true;
@@ -49,31 +46,16 @@ class App {
   }
 
   isCommand() {
+    // eslint-disable-next-line no-unused-vars
     const [nodePath, workDir, command] = process.argv;
     return !!(command && commands.indexOf(command) > -1);
   }
 
-  isServer() {
-    const [nodePath, workDir, command] = process.argv;
-    if (command === undefined) {
-      return true;
-    }
-    return false;
-  }
-
-  startServer() {
-    startServer(this.koaApp, this.config);
-  }
-
   run() {
-    // console.log('Run called, args are: ', process.argv);
-    // console.log('Available Transforms Are: ', Object.keys(this.transforms));
     if (this.isLocal()) {
       this.runLocalTransform();
     } else if (this.isCommand()) {
       this.runCommand();
-    } else if (this.isServer()) {
-      this.startServer();
     }
   }
 
@@ -91,6 +73,7 @@ class App {
   }
 
   runLocalTransform() {
+    // eslint-disable-next-line no-unused-vars
     const [nodePath, workDir, transformName, ...maltegoArgs] = process.argv;
     const request = LocalSerializer.serialize(maltegoArgs);
     const transformFunc = this.transforms[transformName];
@@ -109,7 +92,7 @@ let app;
  */
 function server(meta, config = {}) {
   if (!app) {
-    app = new App(meta, config);
+    app = new Server(meta, config);
   } else {
     console.log('Warning: Server already initialised.');
   }

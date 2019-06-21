@@ -43,6 +43,13 @@ export class DisplayTable {
   }
 }
 
-export function DisplayLink(href, text) {
-  return `<a href="${href}"><h5>${text || href}</h5></a>`;
+/**
+ * Generate HTML to add a link to the display info.
+ * @param {string} href
+ * @param {string} text=View
+ * @param {string} element=h3
+ * @return {string}
+ */
+export function DisplayLink(href, text='View', element='h3') {
+  return `<a href="${href}" style="text-align:center"><${element}>${text}</${element}></a>`;
 }

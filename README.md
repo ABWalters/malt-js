@@ -2,6 +2,11 @@
 
 Library for writing Maltego transforms in Node.
 
+Built to work with three deployment options:
+- Local transforms
+- Serverless Functions (AWS Lambda)
+- Node server
+
 Write the transforms once, and have them run locally, as lambda scripts or as a Koa server.
 
 ## Example
